@@ -34,8 +34,8 @@ def compress(file_path, members):
         with tarfile.open(file_path, mode='w') as tar:
             for member in members:
                 tar.add(member, arcname=member.name)
-    except tarfile.TarError as error:
-        sys.exit(f'[Error]: {error}')
+    except (FileNotFoundError ,tarfile.TarError) as error:
+        sys.exit(error)
 
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
@@ -59,7 +59,7 @@ def compress(file_path, members):
 )
 def main(output_dir, secret_seed, pool_keys):
     if not is_valid_path(output_dir):
-        sys.exit(f'[Error]: "{output_dir}" is not a valid path!')
+        sys.exit(f'[Error] "{output_dir}" is not a valid path')
 
     now = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     hostname_path = pathlib.Path('/etc/hostname')
@@ -67,12 +67,12 @@ def main(output_dir, secret_seed, pool_keys):
 
     # Get hostname and TrueNAS version string
     try:
-        with (hostname_path.open('r') as hostname,
-              version_path.open('r') as version):
+        with hostname_path.open('r') as hostname,\
+              version_path.open('r') as version:
             hostname = hostname.read().strip()
-            version = version.read().split(' ')[0]
+            version = version.read().split(' ')[0].strip()
     except FileNotFoundError as error:
-        sys.exit(f'[Error]: {error}')
+        sys.exit(error)
 
     # Backup file path
     file_path = f'{output_dir}/{hostname}-{version}-{now}'
@@ -92,8 +92,8 @@ def main(output_dir, secret_seed, pool_keys):
 
         try:
             shutil.copy2('/data/freenas-v1.db', file_path)
-        except shutil.Error as error:
-            sys.exit(f'[Error]: {error}')
+        except (FileNotFoundError, shutil.Error) as error:
+            sys.exit(error)
 
 
 if __name__ == '__main__':
