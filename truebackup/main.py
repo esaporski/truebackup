@@ -12,7 +12,7 @@ __version__ = '0.0.1'
 
 def version_msg():
     python_version = sys.version[:3]
-    location = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    location = (pathlib.Path(__file__).parent).parent.absolute()
     message = f'{__version__} from {location} (Python {python_version})'
     return message
 
