@@ -34,7 +34,7 @@ def compress(file_path, members):
         with tarfile.open(file_path, mode='w') as tar:
             for member in members:
                 tar.add(member, arcname=member.name)
-    except (FileNotFoundError ,tarfile.TarError) as error:
+    except (FileNotFoundError, tarfile.TarError) as error:
         sys.exit(error)
 
 
