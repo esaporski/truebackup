@@ -24,6 +24,11 @@ requirements = [
     'click>=7.1.2'
 ]
 
+test_requirements = [
+    'pytest',
+    'pytest-cov'
+]
+
 setup(
     name='truebackup',
     version=get_version('truebackup/main.py'),
@@ -46,5 +51,9 @@ setup(
     include_package_data=True,
     python_requires='>=3.6',
     install_requires=requirements,
+    tests_require=test_requirements,
+    extras_require={
+        'test': test_requirements
+    },
     license='GPLv3',
 )
