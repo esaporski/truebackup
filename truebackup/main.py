@@ -3,6 +3,7 @@ import datetime
 import os
 import pathlib
 import shutil
+import subprocess
 import sys
 import tarfile
 
@@ -62,14 +63,22 @@ def main(output_dir, secret_seed, pool_keys):
         sys.exit(f'[Error] "{output_dir}" is not a valid path')
 
     now = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-    hostname_path = pathlib.Path('/etc/hostname')
+
+    # Get hostname
+    try:
+        result = subprocess.run(['hostname', '-s'], capture_output=True, text=True)
+        result.check_returncode()
+        hostname = result.stdout.strip()
+    except subprocess.CalledProcessError as error:
+        sys.exit(f'{error}\n\t{error.stderr}')
+    except FileNotFoundError as error:
+        sys.exit(error)
+
+    # Get TrueNAS version string
     version_path = pathlib.Path('/etc/version')
 
-    # Get hostname and TrueNAS version string
     try:
-        with hostname_path.open('r') as hostname,\
-              version_path.open('r') as version:
-            hostname = hostname.read().strip()
+        with version_path.open('r') as version:
             version = version.read().split(' ')[0].strip()
     except FileNotFoundError as error:
         sys.exit(error)
