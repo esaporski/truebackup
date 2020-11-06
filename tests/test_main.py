@@ -1,16 +1,20 @@
+import pathlib
 import pytest
 from truebackup.main import is_valid_path
 
 
+# is_valid_path
 @pytest.mark.parametrize(
     'dir, expected', [
         ('.', True),
         ('..', True),
         ('/tmp', True),
+        (pathlib.Path('/tmp'), True),
         ('/invalid/path', False),
         ('/root', False),
         ('/etc/hostname', False),
-        ('\tmp', False)
+        ('\tmp', False),
+        (pathlib.Path('/invalid/path'), False)
     ]
 )
 def test_is_valid_path(dir, expected):
