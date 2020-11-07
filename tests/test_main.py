@@ -1,6 +1,6 @@
 import pathlib
 import pytest
-from truebackup.main import is_valid_path
+from truebackup.main import compress, is_valid_path
 
 
 # is_valid_path
@@ -18,7 +18,7 @@ from truebackup.main import is_valid_path
     ]
 )
 def test_is_valid_path(dir, expected):
-    assert is_valid_path(dir) == expected
+    assert is_valid_path(dir) is expected
 
 
 @pytest.mark.parametrize(
@@ -30,3 +30,49 @@ def test_is_valid_path(dir, expected):
 def test_is_valid_path_error(dir):
     with pytest.raises(TypeError):
         is_valid_path(dir)
+
+
+@pytest.mark.usefixtures('truenas_environment')
+class TestCompress:
+    # Pass
+    def test_pass(self):
+        assert compress(
+            pathlib.Path('compress.tar'), [
+                pathlib.Path('data/freenas-v1.db'),
+                pathlib.Path('data/geli'),
+                pathlib.Path('data/pwenc_secret')
+            ]
+        ) is None
+
+    # Fail - FileNotFoundError
+    def test_file_not_found_error(self):
+        with pytest.raises(SystemExit):  # TODO: should be FileNotFoundError
+            compress(
+                pathlib.Path('invalid/path/compress.tar'), [
+                    pathlib.Path('data/freenas-v1.db'),
+                    pathlib.Path('data/geli'),
+                    pathlib.Path('data/pwenc_secret')
+                ]
+            )
+
+    # Fail - tarfile.TarError
+    def test_tar_error(self):
+        with pytest.raises(SystemExit):  # TODO: should be tarfile.TarError
+            compress(
+                pathlib.Path('compress.tar'), [
+                    pathlib.Path('data/notafile-v1.db'),
+                    pathlib.Path('data/notafolder'),
+                    pathlib.Path('data/not_a_secret')
+                ]
+            )
+
+    # Fail - complete
+    def test_fail(self):
+        with pytest.raises(SystemExit):
+            compress(
+                pathlib.Path('invalid/path/compress.tar'), [
+                    pathlib.Path('data/notafile-v1.db'),
+                    pathlib.Path('data/notafolder'),
+                    pathlib.Path('data/not_a_secret')
+                ]
+            )

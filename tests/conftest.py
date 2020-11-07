@@ -1,5 +1,7 @@
+import os
 import pathlib
 import pytest
+import shutil
 
 
 @pytest.fixture()
@@ -25,4 +27,9 @@ def truenas_environment(tmpdir):
     secret = data.join('pwenc_secret')
     secret.write('fakesecret')
 
-    return pathlib.Path(tmpdir)
+    old_cwd = pathlib.Path.cwd()
+    os.chdir(tmpdir)
+
+    yield
+    os.chdir(old_cwd)
+    shutil.rmtree(tmpdir)
