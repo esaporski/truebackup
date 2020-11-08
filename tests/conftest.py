@@ -32,4 +32,4 @@ def truenas_environment(tmpdir):
 
     yield
     os.chdir(old_cwd)
-    shutil.rmtree(tmpdir)
+    # shutil.rmtree(tmpdir)
