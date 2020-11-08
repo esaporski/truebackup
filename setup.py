@@ -21,7 +21,7 @@ with open('README.md', encoding='utf-8') as readme_file:
     readme = readme_file.read()
 
 requirements = [
-    'click>=7.1.2'
+    'click>=7.1.2',
 ]
 
 test_requirements = [
@@ -31,7 +31,7 @@ test_requirements = [
 
 setup(
     name='truebackup',
-    version=get_version('truebackup/main.py'),
+    version=get_version('truebackup/__init__.py'),
     description=(
         'A command-line utility that can help you perform '
         'automated system configuration backups for TrueNAS.'
@@ -45,7 +45,7 @@ setup(
     package_dir={'truebackup': 'truebackup'},
     entry_points={
         'console_scripts': [
-            'truebackup=truebackup.main:main'
+            'truebackup=truebackup.__main__:main'
         ]
     },
     include_package_data=True,

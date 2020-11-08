@@ -1,4 +1,3 @@
-import click
 import datetime
 import os
 import pathlib
@@ -6,27 +5,6 @@ import shutil
 import subprocess
 import sys
 import tarfile
-
-
-__version__ = '0.0.1'
-
-
-def version_msg():
-    python_version = sys.version[:3]
-    location = (pathlib.Path(__file__).parent).parent.absolute()
-    message = f'{__version__} from {location} (Python {python_version})'
-    return message
-
-
-def is_valid_path(dir):
-    dir = pathlib.Path(dir)
-
-    if not (dir.exists() and
-            dir.is_dir() and
-            os.access(dir, os.W_OK)):
-        return False
-    else:
-        return True
 
 
 def compress(file_path, members):
@@ -39,29 +17,7 @@ def compress(file_path, members):
         sys.exit(error)
 
 
-@click.command(context_settings=dict(help_option_names=['-h', '--help']))
-@click.version_option(__version__, '-V', '--version', message=version_msg())
-@click.option(
-    '-o',
-    '--output-dir',
-    type=click.Path(),
-    required=True,
-    help='File output location (eg., \'/tmp/backup\').'
-)
-@click.option(
-    '--secret-seed',
-    is_flag=True,
-    help='Export password secret seed.',
-)
-@click.option(
-    '--pool-keys',
-    is_flag=True,
-    help='Export pool encryption keys.',
-)
-def main(output_dir, secret_seed, pool_keys):
-    if not is_valid_path(output_dir):
-        sys.exit(f'[Error] "{output_dir}" is not a valid path')
-
+def truebackup(output_dir, secret_seed, pool_keys):
     now = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
     # Get hostname
@@ -103,7 +59,3 @@ def main(output_dir, secret_seed, pool_keys):
             shutil.copy2('/data/freenas-v1.db', file_path)
         except (FileNotFoundError, shutil.Error) as error:
             sys.exit(error)
-
-
-if __name__ == '__main__':
-    main()
